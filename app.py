@@ -6,7 +6,7 @@ app = Flask(__name__)
 id_valido = "3"
 
 # Link real de la reunión
-meeting_link = "https://teams.microsoft.com/l/meetup-join/ACTUAL-LINK"
+meeting_link = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_YTgxNzE3NmItYjY1MS00YzQ1LWFhZDYtYjcxOGM3ZDVhMDE2%40thread.v2/0?context=%7b%22Tid%22%3a%225318335c-fe2e-4810-8cd7-1c0bcb5f0177%22%2c%22Oid%22%3a%221cfebae2-ccce-481c-82a2-1d0572b7ff8f%22%7d"
 
 @app.route("/")
 def home():
