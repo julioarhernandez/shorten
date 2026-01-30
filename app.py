@@ -1,16 +1,20 @@
-
 import os
 from flask import Flask, request, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
 from io import StringIO
+from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 
 # Google Sheets Config
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-SPREADSHEET_NAME = 'shorten-ss'  # Cambia por el nombre de tu hoja
+SPREADSHEET_NAME = 'shorten-ss'
+
+# Timezone configuration (ajusta según tu zona horaria)
+TIMEZONE = pytz.timezone('America/New_York')  # Cambia según tu ubicación
 
 # Conectar a Google Sheets desde variable de entorno
 def conectar_hoja():
@@ -20,6 +24,27 @@ def conectar_hoja():
     client = gspread.authorize(creds)
     hoja = client.open(SPREADSHEET_NAME).sheet1
     return hoja
+
+# Verificar si la hora actual está dentro del rango permitido
+def verificar_horario(id_usuario):
+    ahora = datetime.now(TIMEZONE)
+    hora_actual = ahora.time()
+    
+    # Si el ID empieza con "AM"
+    if id_usuario.startswith("AM"):
+        # Permitir entre 7:45 AM y 12:00 PM
+        inicio = datetime.strptime("07:45", "%H:%M").time()
+        fin = datetime.strptime("12:00", "%H:%M").time()
+        return inicio <= hora_actual <= fin
+    
+    # Si el ID empieza con "PM"
+    elif id_usuario.startswith("PM"):
+        # Permitir desde 5:45 PM en adelante (hasta medianoche)
+        inicio = datetime.strptime("17:45", "%H:%M").time()
+        return hora_actual >= inicio
+    
+    # Si no tiene prefijo válido, denegar acceso
+    return False
 
 # Buscar el meeting_id asociado al ID
 def obtener_meeting_link(id_usuario):
@@ -37,12 +62,25 @@ def home():
 @app.route("/entrar")
 def entrar():
     id_recibido = request.args.get("id")
-
+    
     if not id_recibido:
         return "❌ Debes proporcionar un ID."
-
+    
+    # Verificar horario permitido
+    if not verificar_horario(id_recibido):
+        ahora = datetime.now(TIMEZONE)
+        hora_actual = ahora.strftime("%I:%M %p")
+        
+        if id_recibido.startswith("AM"):
+            return f"⏰ Este enlace solo está disponible entre 7:45 AM y 12:00 PM. Hora actual: {hora_actual}"
+        elif id_recibido.startswith("PM"):
+            return f"⏰ Este enlace solo está disponible desde las 5:45 PM en adelante. Hora actual: {hora_actual}"
+        else:
+            return "❌ ID inválido."
+    
+    # Buscar el meeting link
     meeting_link = obtener_meeting_link(id_recibido)
-
+    
     if meeting_link:
         return redirect(meeting_link)
     else:
