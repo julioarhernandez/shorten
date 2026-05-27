@@ -39,9 +39,9 @@ def verificar_horario(id_usuario):
     
     # Si el ID empieza con "PM"
     elif id_usuario.startswith("PM"):
-        # Permitir entre 5:45 PM y 11:59 PM (medianoche)
+        # Permitir entre 5:45 PM y 8:59 PM 
         inicio = datetime.strptime("17:45", "%H:%M").time()
-        fin = datetime.strptime("23:59", "%H:%M").time()
+        fin = datetime.strptime("20:59", "%H:%M").time()
         return inicio <= hora_actual <= fin
     
     # Si no tiene prefijo válido, denegar acceso
@@ -75,7 +75,7 @@ def entrar():
         if id_recibido.startswith("AM"):
             return f"⏰ Este enlace solo está disponible entre 8:15 AM y 12:00 PM. Hora actual: {hora_actual}"
         elif id_recibido.startswith("PM"):
-            return f"⏰ Este enlace solo está disponible entre 5:45 PM y 11:59 PM. Hora actual: {hora_actual}"
+            return f"⏰ Este enlace solo está disponible entre 5:45 PM y 9:59 PM. Hora actual: {hora_actual}"
         else:
             return "❌ ID inválido."
     
