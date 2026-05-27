@@ -32,8 +32,8 @@ def verificar_horario(id_usuario):
     
     # Si el ID empieza con "AM"
     if id_usuario.startswith("AM"):
-        # Permitir entre 7:45 AM y 12:00 PM
-        inicio = datetime.strptime("07:45", "%H:%M").time()
+        # Permitir entre 8:15 AM y 12:00 PM
+        inicio = datetime.strptime("08:15", "%H:%M").time()
         fin = datetime.strptime("12:00", "%H:%M").time()
         return inicio <= hora_actual <= fin
     
@@ -73,7 +73,7 @@ def entrar():
         hora_actual = ahora.strftime("%I:%M %p")
         
         if id_recibido.startswith("AM"):
-            return f"⏰ Este enlace solo está disponible entre 7:45 AM y 12:00 PM. Hora actual: {hora_actual}"
+            return f"⏰ Este enlace solo está disponible entre 8:15 AM y 12:00 PM. Hora actual: {hora_actual}"
         elif id_recibido.startswith("PM"):
             return f"⏰ Este enlace solo está disponible entre 5:45 PM y 11:59 PM. Hora actual: {hora_actual}"
         else:
